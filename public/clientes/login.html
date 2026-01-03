@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Vivero Solís</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; }
+        .login-container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; }
+        h2 { text-align: center; color: #5F8D4E; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #5F8D4E; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #4c7a3b; }
+        .error { color: red; font-size: 0.9rem; text-align: center; display: none; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <input type="email" id="correo" placeholder="Correo electrónico" required>
+            <input type="password" id="contra" placeholder="Contraseña" required>
+            <button type="submit">Entrar</button>
+            <p class="error" id="mensajeError"></p>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('mensajeError');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const correo = document.getElementById('correo').value;
+            const contra = document.getElementById('contra').value;
+
+            try {
+                const respuesta = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ correo, contra })
+                });
+
+                const datos = await respuesta.json();
+
+                if (respuesta.ok) {
+                    if (datos.rol === 'admin') {
+                        window.location.href = '/administracion/dashboard.html';
+                    } else {
+                        window.location.href = '/tienda/index.html'; 
+                    }
+                } else {
+                    errorMsg.textContent = datos.mensaje || 'Error al entrar'; 
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error(error);
+                errorMsg.textContent = 'Error de conexión con el servidor';
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

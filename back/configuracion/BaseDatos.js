@@ -1,7 +1,5 @@
 const mysql = require('mysql2');
-const dotenv = require('dotenv');
-
-dotenv.config();
+require('dotenv').config();
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
@@ -15,21 +13,11 @@ const pool = mysql.createPool({
 
 pool.getConnection((err, connection) => {
     if (err) {
-        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            console.error('La conexión con la base de datos fue cerrada.');
-        }
-        if (err.code === 'ER_CON_COUNT_ERROR') {
-            console.error('La base de datos tiene muchas conexiones.');
-        }
-        if (err.code === 'ECONNREFUSED') {
-            console.error('La conexión con la base de datos fue rechazada.');
-        }
-    }
-    if (connection) {
+        console.error('Error de conexión a la BD:', err.message);
+    } else {
         console.log('Conexión a la base de datos establecida correctamente');
         connection.release();
     }
-    return;
 });
 
 module.exports = pool.promise();

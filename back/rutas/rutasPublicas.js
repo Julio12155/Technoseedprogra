@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
-
-const productoController = require('../controladores/productoControlador');
-const clienteController = require('../controladores/clienteControlador');
+const productoCtrl = require('../controladores/productoControlador');
+const clienteCtrl = require('../controladores/clienteControlador');
+const pedidoCtrl = require('../controladores/pedidoControlador');
 const { soloUsuarios } = require('../middleware/verificarSesion');
 
-router.get('/productos', productoController.obtenerTodas);
-router.get('/productos/:id', productoController.obtenerUna);
+router.get('/productos', productoCtrl.obtenerTodas);
+router.get('/productos/:id', productoCtrl.obtenerUna);
+router.get('/categorias', productoCtrl.obtenerCategorias); 
 
-router.get('/mi-perfil', soloUsuarios, clienteController.verPerfil);
-router.put('/mi-perfil', soloUsuarios, clienteController.actualizarPerfil);
+router.get('/mi-perfil', soloUsuarios, clienteCtrl.obtenerPerfil);
+router.post('/mi-perfil/direccion', soloUsuarios, clienteCtrl.guardarDetallesEnvio);
+
 router.post('/comprar', soloUsuarios, pedidoCtrl.crearPedido);
+
 module.exports = router;

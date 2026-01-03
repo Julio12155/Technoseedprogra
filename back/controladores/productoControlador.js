@@ -4,7 +4,12 @@ const path = require('path');
 
 const obtenerTodas = async (req, res) => {
     try {
-        const [plantas] = await db.query('SELECT * FROM productos');
+        const sql = `
+            SELECT p.*, c.nombre as nombre_categoria 
+            FROM productos p 
+            LEFT JOIN categorias c ON p.categoria_id = c.id
+        `;
+        const [plantas] = await db.query(sql);
         res.json(plantas);
     } catch (error) {
         res.status(500).send('Error obteniendo plantas');
@@ -21,26 +26,35 @@ const obtenerUna = async (req, res) => {
     }
 };
 
+const obtenerCategorias = async (req, res) => {
+    try {
+        const [cats] = await db.query('SELECT * FROM categorias');
+        res.json(cats);
+    } catch (error) {
+        res.status(500).send('Error obteniendo categorías');
+    }
+};
+
 const crearPlanta = async (req, res) => {
-    const { nom, desc, prec, stock } = req.body;
+    const { nom, desc, prec, stock, categoria } = req.body;
     const img = req.file ? req.file.filename : null;
 
     try {
-        await db.query('INSERT INTO productos (nombre, descripcion, precio, stock, imagen) VALUES (?, ?, ?, ?, ?)', 
-            [nom, desc, prec, stock, img]);
+        await db.query('INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, imagen) VALUES (?, ?, ?, ?, ?, ?)', 
+            [nom, desc, prec, stock, categoria || null, img]);
         res.send('Planta agregada al vivero');
     } catch (error) {
-        res.status(500).send('Error al guardar planta');
+        res.status(500).send('Error al guardar planta: ' + error.message);
     }
 };
 
 const editarPlanta = async (req, res) => {
     const { id } = req.params;
-    const { nom, desc, prec, stock } = req.body;
+    const { nom, desc, prec, stock, categoria } = req.body;
     
     try {
-        let query = 'UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=?';
-        let datos = [nom, desc, prec, stock];
+        let query = 'UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=?, categoria_id=?';
+        let datos = [nom, desc, prec, stock, categoria || null];
 
         if (req.file) {
             query += ', imagen=?';
@@ -65,10 +79,10 @@ const eliminarPlanta = async (req, res) => {
         res.status(500).send('Error eliminando');
     }
 };
+
 const reabastecerStock = async (req, res) => {
     const { id } = req.params;
     const { cantidad } = req.body; 
-
     try {
         await db.query('UPDATE productos SET stock = stock + ? WHERE id = ?', [cantidad, id]);
         res.send('Inventario actualizado');
@@ -85,4 +99,14 @@ const obtenerAlertasStock = async (req, res) => {
         res.status(500).send('Error obteniendo alertas');
     }
 };
-module.exports = { obtenerTodas, obtenerUna, crearPlanta, editarPlanta, eliminarPlanta, reabastecerStock, obtenerAlertasStock };
+
+module.exports = { 
+    obtenerTodas, 
+    obtenerUna, 
+    obtenerCategorias, 
+    crearPlanta, 
+    editarPlanta, 
+    eliminarPlanta, 
+    reabastecerStock, 
+    obtenerAlertasStock 
+};
