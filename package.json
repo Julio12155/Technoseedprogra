@@ -1,9 +1,9 @@
 {
-  "name": "technoseed",
+  "name": "viverosolis",
   "version": "1.0.0",
-  "description": "",
+  "description": "Proyecto final progra",
   "license": "ISC",
-  "author": "",
+  "author": "Julio Cesar",
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
@@ -11,7 +11,12 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "path": "^0.12.7"
+    "multer": "^2.0.2",
+    "mysql2": "^3.16.0",
+    "tree": "^0.1.3"
   }
 }
