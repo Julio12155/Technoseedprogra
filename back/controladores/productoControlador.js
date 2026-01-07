@@ -12,6 +12,7 @@ const obtenerTodas = async (req, res) => {
         const [plantas] = await db.query(sql);
         res.json(plantas);
     } catch (error) {
+        console.error("ERROR REAL:", error.message); // Esto nos dirá qué pasa
         res.status(500).send('Error obteniendo plantas');
     }
 };
@@ -22,6 +23,7 @@ const obtenerUna = async (req, res) => {
         if (planta.length === 0) return res.status(404).send('Planta no encontrada');
         res.json(planta[0]);
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error del servidor');
     }
 };
@@ -31,6 +33,7 @@ const obtenerCategorias = async (req, res) => {
         const [cats] = await db.query('SELECT * FROM categorias');
         res.json(cats);
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error obteniendo categorías');
     }
 };
@@ -44,6 +47,7 @@ const crearPlanta = async (req, res) => {
             [nom, desc, prec, stock, categoria || null, img]);
         res.send('Planta agregada al vivero');
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error al guardar planta: ' + error.message);
     }
 };
@@ -67,6 +71,7 @@ const editarPlanta = async (req, res) => {
         await db.query(query, datos);
         res.send('Datos de la planta actualizados');
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error actualizando');
     }
 };
@@ -76,6 +81,7 @@ const eliminarPlanta = async (req, res) => {
         await db.query('DELETE FROM productos WHERE id = ?', [req.params.id]);
         res.send('Planta eliminada del catalogo');
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error eliminando');
     }
 };
@@ -87,6 +93,7 @@ const reabastecerStock = async (req, res) => {
         await db.query('UPDATE productos SET stock = stock + ? WHERE id = ?', [cantidad, id]);
         res.send('Inventario actualizado');
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error reabasteciendo');
     }
 };
@@ -96,6 +103,7 @@ const obtenerAlertasStock = async (req, res) => {
         const [alertas] = await db.query('SELECT * FROM productos WHERE stock < 10 ORDER BY stock ASC');
         res.json(alertas);
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error obteniendo alertas');
     }
 };
