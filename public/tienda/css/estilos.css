@@ -222,6 +222,86 @@ nav {
     font-weight: bold;
     transition: background 0.3s;
 }
+.justificacion {
+    padding: 80px 5%;
+    background-color: var(--blanco);
+}
+
+.justificacion {
+    text-align: center;
+    font-size: 40px;
+    margin-bottom: 60px;
+    color: var(--texto);
+}
+
+.features-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+    position: relative;
+}
+
+.features-container::before {
+    content: '';
+    position: absolute;
+    top: 60px;
+    left: 12%;
+    right: 12%;
+    height: 2px;
+    background-color: var(--verde-acento);
+    z-index: 0;
+}
+
+.feature-item {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.feature-icon {
+    width: 120px;
+    height: 120px;
+    background-color: var(--verde-acento);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.feature-item:hover .feature-icon {
+    background-color: var(--verde-suave);
+}
+
+.feature-icon svg {
+    width: 60px;
+    height: 60px;
+    fill: var(--blanco);
+}
+
+.feature-item h3 {
+    font-size: 24px;
+    color: var(--texto);
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.feature-item p {
+    font-size: 16px;
+    color: var(--texto-claro);
+    line-height: 1.6;
+}
+
+.feature-item p strong {
+    color: var(--verde-acento);
+    font-weight: 600;
+}
+
 
 .btn-comprar:hover {
     background-color: var(--verde-acento);
