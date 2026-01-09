@@ -44,6 +44,7 @@ const crearPedido = async (req, res) => {
         res.json({ mensaje: 'Compra realizada con exito', pedidoId: idPedido });
 
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error al procesar la compra: ' + error.message);
     }
 };
@@ -61,7 +62,25 @@ const obtenerPedidosAdmin = async (req, res) => {
         const [pedidos] = await db.query(sql);
         res.json(pedidos);
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error obteniendo pedidos');
+    }
+};
+
+const obtenerMisPedidos = async (req, res) => {
+    const id = req.session.usuarioID;
+    try {
+        const sql = `
+            SELECT id, total, estado, fecha 
+            FROM pedidos 
+            WHERE usuario_id = ? 
+            ORDER BY fecha DESC
+        `;
+        const [pedidos] = await db.query(sql, [id]);
+        res.json(pedidos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener pedidos');
     }
 };
 
@@ -73,8 +92,9 @@ const actualizarEstadoPedido = async (req, res) => {
         await db.query('UPDATE pedidos SET estado = ? WHERE id = ?', [estado, id]);
         res.send('Estado del pedido actualizado');
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error actualizando pedido');
     }
 };
 
-module.exports = { crearPedido, obtenerPedidosAdmin, actualizarEstadoPedido };
+module.exports = { crearPedido, obtenerPedidosAdmin, obtenerMisPedidos, actualizarEstadoPedido };

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Vivero Solís</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="../tienda/index.html" class="logo">Vivero Solís</a>
+            <ul class="nav-menu">
+                <li><a href="../tienda/index.html">Volver a la Tienda</a></li>
+                <li><a href="/api/auth/logout" style="color: var(--terracota);">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar-perfil">
+            <div class="user-header">
+                <div class="avatar" id="avatar-letra">U</div>
+                <h3 id="nombre-usuario">Cargando...</h3>
+                <p id="email-usuario" style="font-size: 0.9rem; color: var(--texto-claro);">...</p>
+            </div>
+            <div class="menu-opciones">
+                <button onclick="cambiarTab('direccion')" class="active" id="btn-direccion">📍 Dirección de Envío</button>
+                <button onclick="cambiarTab('pedidos')" id="btn-pedidos">📦 Mis Pedidos</button>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <div id="direccion" class="seccion active">
+                <h2 class="section-title">Dirección de Envío</h2>
+                <form id="form-direccion">
+                    <div class="form-group">
+                        <label>Teléfono de contacto</label>
+                        <input type="tel" id="tel" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Calle y Número</label>
+                        <input type="text" id="calle" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Ciudad</label>
+                            <input type="text" id="ciudad" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <input type="text" id="estado" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Código Postal</label>
+                        <input type="text" id="cp" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Instrucciones de entrega (Opcional)</label>
+                        <textarea id="instrucc" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn-guardar">Guardar Dirección</button>
+                </form>
+            </div>
+
+            <div id="pedidos" class="seccion">
+                <h2 class="section-title">Historial de Pedidos</h2>
+                <div id="lista-pedidos">
+                    <p>Cargando historial...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/perfil.js"></script>
+</body>
+</html>
