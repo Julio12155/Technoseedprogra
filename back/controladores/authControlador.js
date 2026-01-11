@@ -53,7 +53,7 @@ const login = async (req, res) => {
 
 const cerrarSesion = (req, res) => {
     req.session.destroy();
-    res.send('Adios');
+    res.redirect('/clientes/login.html');
 };
 
 module.exports = { registrar, login, cerrarSesion };

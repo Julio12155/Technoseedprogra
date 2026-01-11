@@ -84,6 +84,36 @@ const obtenerMisPedidos = async (req, res) => {
     }
 };
 
+const obtenerDetallesPedido = async (req, res) => {
+    const idUsuario = req.session.usuarioID;
+    const idPedido = req.params.id;
+
+    try {
+        const [pedido] = await db.query('SELECT * FROM pedidos WHERE id = ? AND usuario_id = ?', [idPedido, idUsuario]);
+        
+        if (pedido.length === 0) {
+            return res.status(404).send('Pedido no encontrado');
+        }
+
+        const sqlDetalles = `
+            SELECT dp.cantidad, dp.precio_unitario, p.nombre, p.imagen 
+            FROM detalles_pedido dp
+            JOIN productos p ON dp.producto_id = p.id
+            WHERE dp.pedido_id = ?
+        `;
+        const [productos] = await db.query(sqlDetalles, [idPedido]);
+
+        res.json({
+            info: pedido[0],
+            items: productos
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error obteniendo detalles');
+    }
+};
+
 const actualizarEstadoPedido = async (req, res) => {
     const { id } = req.params;
     const { estado } = req.body; 
@@ -97,4 +127,4 @@ const actualizarEstadoPedido = async (req, res) => {
     }
 };
 
-module.exports = { crearPedido, obtenerPedidosAdmin, obtenerMisPedidos, actualizarEstadoPedido };
+module.exports = { crearPedido, obtenerPedidosAdmin, obtenerMisPedidos, obtenerDetallesPedido, actualizarEstadoPedido };

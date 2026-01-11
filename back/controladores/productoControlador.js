@@ -2,6 +2,9 @@ const db = require('../configuracion/BaseDatos');
 const fs = require('fs');
 const path = require('path');
 
+const esNumero = (valor) => !isNaN(valor) && Number.isInteger(parseFloat(valor));
+const esTextoValido = (texto) => typeof texto === 'string' && texto.trim().length > 0 && !/[<>;]/.test(texto); // Evita inyección básica XSS/SQL en texto
+
 const obtenerTodas = async (req, res) => {
     try {
         const sql = `
@@ -12,8 +15,23 @@ const obtenerTodas = async (req, res) => {
         const [plantas] = await db.query(sql);
         res.json(plantas);
     } catch (error) {
-        console.error("ERROR REAL:", error.message); // Esto nos dirá qué pasa
-        res.status(500).send('Error obteniendo plantas');
+        console.error("ERROR SQL:", error.message);
+        res.status(500).send('Error interno del servidor');
+    }
+};
+const obtenerTopStock = async (req, res) => {
+    try {
+        const sql = `
+            SELECT p.*, c.nombre as nombre_categoria 
+            FROM productos p 
+            LEFT JOIN categorias c ON p.categoria_id = c.id
+            ORDER BY p.stock DESC
+            LIMIT 3
+        `;
+        const [plantas] = await db.query(sql);
+        res.json(plantas);
+    } catch (error) {
+        res.status(500).send('Error obteniendo top productos');
     }
 };
 
@@ -110,8 +128,9 @@ const obtenerAlertasStock = async (req, res) => {
 
 module.exports = { 
     obtenerTodas, 
+    obtenerTopStock,
     obtenerUna, 
-    obtenerCategorias, 
+    obtenerCategorias,
     crearPlanta, 
     editarPlanta, 
     eliminarPlanta, 

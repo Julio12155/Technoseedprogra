@@ -36,6 +36,7 @@ body {
     position: fixed;
     height: 100vh;
     overflow-y: auto;
+    z-index: 100;
 }
 
 .logo-admin {
@@ -224,6 +225,7 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 600px;
 }
 
 thead {
@@ -378,7 +380,64 @@ td {
 }
 
 @media (max-width: 768px) {
-    .sidebar { width: 0; overflow: hidden; }
-    .main-content { margin-left: 0; }
-    .form-row { grid-template-columns: 1fr; }
+    .admin-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding: 0.5rem 0;
+        border-right: none;
+        border-bottom: 1px solid var(--borde);
+    }
+    
+    .sidebar nav {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 0 1rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-item {
+        white-space: nowrap;
+        padding: 0.8rem 1rem;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        font-size: 0.9rem;
+    }
+
+    .nav-item:hover, .nav-item.active {
+        background-color: transparent;
+        border-left: none;
+        border-bottom: 3px solid var(--verde-acento);
+    }
+
+    .logo-admin {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .header-admin {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 1.5rem;
+    }
 }
