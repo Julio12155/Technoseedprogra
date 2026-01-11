@@ -1,27 +1,52 @@
 const express = require('express');
 const router = express.Router();
 const productoCtrl = require('../controladores/productoControlador');
-const adminCtrl = require('../controladores/adminControlador');
 const pedidoCtrl = require('../controladores/pedidoControlador');
-const subirImg = require('../middleware/gestorImagenes');
-const { soloAdmin } = require('../middleware/verificarSesion');
+const adminUserCtrl = require('../controladores/adminUsuariosControlador');
+const { verificarSesionAdmin } = require('../middleware/verificarSesion');
 
-router.use(soloAdmin);
+router.use(verificarSesionAdmin);
 
-router.get('/dashboard-datos', adminCtrl.datosDashboard);
+router.get('/dashboard-datos', async (req, res) => {
+    const db = require('../configuracion/BaseDatos');
+    try {
+        const [ventas] = await db.query('SELECT SUM(total) as total FROM pedidos WHERE estado != "cancelado"');
+        const [pendientes] = await db.query('SELECT COUNT(*) as total FROM pedidos WHERE estado = "pendiente"');
+        const [stock] = await db.query('SELECT COUNT(*) as total FROM productos WHERE stock < 5');
+        const [clientes] = await db.query('SELECT COUNT(*) as total FROM usuarios WHERE rol = "cliente"');
+        
+        res.json({
+            ventasTotal: ventas[0].total || 0,
+            pedidosPendientes: pendientes[0].total || 0,
+            alertasStock: stock[0].total || 0,
+            totalClientes: clientes[0].total || 0
+        });
+    } catch (error) {
+        res.status(500).send('Error');
+    }
+});
 
-router.get('/usuarios', adminCtrl.verUsuarios); 
-router.delete('/usuarios/:id', adminCtrl.borrarUsuario);
+router.get('/productos', productoCtrl.obtenerTodas);
+router.post('/productos', productoCtrl.crearProducto);
+router.put('/productos/:id', productoCtrl.editarProducto);
+router.delete('/productos/:id', productoCtrl.eliminarProducto);
+router.put('/productos/reabastecer/:id', productoCtrl.reabastecerStock);
+router.get('/categorias', productoCtrl.obtenerCategorias);
 
-router.get('/categorias', productoCtrl.obtenerCategorias); 
+router.get('/pedidos', pedidoCtrl.obtenerPedidosAdmin);
+router.get('/pedidos/:id', pedidoCtrl.obtenerDetallesAdmin); 
+router.put('/pedidos/:id', pedidoCtrl.actualizarPedidoAdmin);
 
-router.post('/productos', subirImg.single('foto'), productoCtrl.crearPlanta);
-router.put('/productos/:id', subirImg.single('foto'), productoCtrl.editarPlanta);
-router.delete('/productos/:id', productoCtrl.eliminarPlanta);
-router.put('/productos/reabastecer/:id', productoCtrl.reabastecerStock); 
-router.get('/inventario/alertas', productoCtrl.obtenerAlertasStock); 
+router.get('/clientes', adminUserCtrl.obtenerClientes);
+router.get('/clientes/:id', adminUserCtrl.obtenerUnCliente);
+router.post('/clientes', adminUserCtrl.crearCliente);
+router.put('/clientes/:id', adminUserCtrl.editarCliente);
+router.delete('/clientes/:id', adminUserCtrl.eliminarCliente);
 
-router.get('/pedidos', pedidoCtrl.obtenerPedidosAdmin); 
-router.put('/pedidos/:id', pedidoCtrl.actualizarEstadoPedido); 
+router.get('/inventario/alertas', async (req, res) => {
+    const db = require('../configuracion/BaseDatos');
+    const [alertas] = await db.query('SELECT * FROM productos WHERE stock < 5');
+    res.json(alertas);
+});
 
 module.exports = router;

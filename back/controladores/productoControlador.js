@@ -1,9 +1,8 @@
 const db = require('../configuracion/BaseDatos');
-const fs = require('fs');
-const path = require('path');
 
-const esNumero = (valor) => !isNaN(valor) && Number.isInteger(parseFloat(valor));
-const esTextoValido = (texto) => typeof texto === 'string' && texto.trim().length > 0 && !/[<>;]/.test(texto); // Evita inyección básica XSS/SQL en texto
+const esNumero = (valor) => !isNaN(valor) && valor !== '' && valor !== null;
+const esTextoValido = (texto) => typeof texto === 'string' && texto.trim().length > 0;
+
 
 const obtenerTodas = async (req, res) => {
     try {
@@ -19,6 +18,7 @@ const obtenerTodas = async (req, res) => {
         res.status(500).send('Error interno del servidor');
     }
 };
+
 const obtenerTopStock = async (req, res) => {
     try {
         const sql = `
@@ -36,12 +36,14 @@ const obtenerTopStock = async (req, res) => {
 };
 
 const obtenerUna = async (req, res) => {
+    const { id } = req.params;
+    if (!esNumero(id)) return res.status(400).send('ID inválido');
+
     try {
-        const [planta] = await db.query('SELECT * FROM productos WHERE id = ?', [req.params.id]);
-        if (planta.length === 0) return res.status(404).send('Planta no encontrada');
+        const [planta] = await db.query('SELECT * FROM productos WHERE id = ?', [id]);
+        if (planta.length === 0) return res.status(404).send('Producto no encontrado');
         res.json(planta[0]);
     } catch (error) {
-        console.error(error);
         res.status(500).send('Error del servidor');
     }
 };
@@ -51,78 +53,79 @@ const obtenerCategorias = async (req, res) => {
         const [cats] = await db.query('SELECT * FROM categorias');
         res.json(cats);
     } catch (error) {
-        console.error(error);
         res.status(500).send('Error obteniendo categorías');
     }
 };
 
-const crearPlanta = async (req, res) => {
+
+const crearProducto = async (req, res) => {
     const { nom, desc, prec, stock, categoria } = req.body;
-    const img = req.file ? req.file.filename : null;
+    const imagen = req.file ? req.file.filename : null; 
+
+    if (!esTextoValido(nom) || !esNumero(prec)) {
+        return res.status(400).send('Datos inválidos');
+    }
 
     try {
-        await db.query('INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, imagen) VALUES (?, ?, ?, ?, ?, ?)', 
-            [nom, desc, prec, stock, categoria || null, img]);
-        res.send('Planta agregada al vivero');
+        await db.query(
+            'INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, imagen) VALUES (?, ?, ?, ?, ?, ?)',
+            [nom, desc, prec, stock, categoria, imagen]
+        );
+        res.send('Producto creado');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error al guardar planta: ' + error.message);
+        res.status(500).send('Error al crear producto');
     }
 };
 
-const editarPlanta = async (req, res) => {
+const editarProducto = async (req, res) => {
     const { id } = req.params;
     const { nom, desc, prec, stock, categoria } = req.body;
     
-    try {
-        let query = 'UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=?, categoria_id=?';
-        let datos = [nom, desc, prec, stock, categoria || null];
+    const nuevaImagen = req.file ? req.file.filename : null;
 
-        if (req.file) {
-            query += ', imagen=?';
-            datos.push(req.file.filename);
+    try {
+        let sql;
+        let params;
+
+        if (nuevaImagen) {
+            sql = 'UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=?, categoria_id=?, imagen=? WHERE id=?';
+            params = [nom, desc, prec, stock, categoria, nuevaImagen, id];
+        } else {
+            sql = 'UPDATE productos SET nombre=?, descripcion=?, precio=?, stock=?, categoria_id=? WHERE id=?';
+            params = [nom, desc, prec, stock, categoria, id];
         }
 
-        query += ' WHERE id=?';
-        datos.push(id);
-
-        await db.query(query, datos);
-        res.send('Datos de la planta actualizados');
+        await db.query(sql, params);
+        res.send('Producto actualizado');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error actualizando');
+        res.status(500).send('Error al editar');
     }
 };
 
-const eliminarPlanta = async (req, res) => {
+const eliminarProducto = async (req, res) => {
+    const { id } = req.params;
     try {
-        await db.query('DELETE FROM productos WHERE id = ?', [req.params.id]);
-        res.send('Planta eliminada del catalogo');
+        await db.query('DELETE FROM productos WHERE id = ?', [id]);
+        res.send('Producto eliminado');
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error eliminando');
+        res.status(500).send('Error al eliminar');
     }
 };
 
 const reabastecerStock = async (req, res) => {
     const { id } = req.params;
     const { cantidad } = req.body; 
+
+    if (!esNumero(id) || !esNumero(cantidad)) return res.status(400).send('Datos inválidos');
+
     try {
         await db.query('UPDATE productos SET stock = stock + ? WHERE id = ?', [cantidad, id]);
         res.send('Inventario actualizado');
     } catch (error) {
-        console.error(error);
         res.status(500).send('Error reabasteciendo');
-    }
-};
-
-const obtenerAlertasStock = async (req, res) => {
-    try {
-        const [alertas] = await db.query('SELECT * FROM productos WHERE stock < 10 ORDER BY stock ASC');
-        res.json(alertas);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error obteniendo alertas');
     }
 };
 
@@ -130,10 +133,9 @@ module.exports = {
     obtenerTodas, 
     obtenerTopStock,
     obtenerUna, 
-    obtenerCategorias,
-    crearPlanta, 
-    editarPlanta, 
-    eliminarPlanta, 
-    reabastecerStock, 
-    obtenerAlertasStock 
+    obtenerCategorias, 
+    crearProducto,      
+    editarProducto,     
+    eliminarProducto,   
+    reabastecerStock
 };

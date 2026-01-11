@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    cargarDestacados();
+    verificarSesionHeader();
+});
+
+async function cargarDestacados() {
     const contenedor = document.getElementById('contenedor-productos');
     try {
         const res = await fetch('/api/public/productos/top'); 
@@ -29,4 +34,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error(error);
         contenedor.innerHTML = '<p style="color:red">Error cargando destacados</p>';
     }
-});
+}
+
+async function verificarSesionHeader() {
+    try {
+        const res = await fetch('/api/auth/estado-sesion');
+        const data = await res.json();
+
+        if (data.autenticado) {
+            const btnLogin = document.querySelector('.btn-login');
+            if (btnLogin) {
+                if (data.rol === 'admin') {
+                    btnLogin.textContent = 'Panel Admin';
+                    btnLogin.href = '../administracion/dashboard.html';
+                    btnLogin.style.backgroundColor = 'var(--terracota)';
+                    btnLogin.style.borderColor = 'var(--terracota)';
+                } else {
+                    btnLogin.textContent = 'Mi Perfil';
+                    btnLogin.href = '../clientes/perfil.html';
+                }
+            }
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}

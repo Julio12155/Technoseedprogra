@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos - Panel Admin</title>
+    <title>Clientes - Panel Admin</title>
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
@@ -16,9 +16,9 @@
 
             <nav>
                 <a href="dashboard.html" class="nav-item">Dashboard</a>
-                <a href="productos.html" class="nav-item active">Productos</a>
+                <a href="productos.html" class="nav-item">Productos</a>
                 <a href="pedidos.html" class="nav-item">Pedidos</a>
-                <a href="clientes.html" class="nav-item">Clientes</a>
+                <a href="clientes.html" class="nav-item active">Clientes</a>
                 <a href="/api/auth/logout" class="nav-item" style="color: var(--terracota);">Cerrar Sesión</a>
             </nav>
         </aside>
@@ -26,8 +26,8 @@
         <main class="main-content">
             <div class="header-admin">
                 <div>
-                    <h1>Gestión de Productos</h1>
-                    <p style="color: var(--texto-claro);">Administra el catálogo del vivero</p>
+                    <h1>Gestión de Clientes</h1>
+                    <p style="color: var(--texto-claro);">Administra los usuarios registrados</p>
                 </div>
                 <div class="user-info">
                     <div class="user-avatar">A</div>
@@ -36,24 +36,23 @@
 
             <div class="content-section">
                 <div class="section-header">
-                    <h2 class="section-title">Listado de Productos</h2>
-                    <button class="btn btn-primary" onclick="abrirModal()">+ Nuevo Producto</button>
+                    <h2 class="section-title">Listado de Clientes</h2>
+                    <button class="btn btn-primary" onclick="abrirModal()">+ Nuevo Cliente</button>
                 </div>
 
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th>Imagen</th>
+                                <th>ID</th>
                                 <th>Nombre</th>
-                                <th>Categoría</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
+                                <th>Email</th>
+                                <th>Fecha Registro</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-productos">
-                            <tr><td colspan="6">Cargando...</td></tr>
+                        <tbody id="tabla-clientes">
+                            <tr><td colspan="5">Cargando...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -61,46 +60,29 @@
         </main>
     </div>
 
-    <div id="modalProducto" class="modal">
+    <div id="modalCliente" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="tituloModal">Nuevo Producto</h2>
+                <h2 id="tituloModal">Nuevo Cliente</h2>
                 <span class="close" onclick="cerrarModal()">&times;</span>
             </div>
-            <form id="formProducto">
-                <input type="hidden" id="prodId">
+            <form id="formCliente">
+                <input type="hidden" id="clienteId">
                 
                 <div class="form-group">
-                    <label>Nombre del Producto</label>
+                    <label>Nombre Completo</label>
                     <input type="text" id="nombre" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Descripción</label>
-                    <textarea id="descripcion" rows="3"></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Precio</label>
-                        <input type="number" id="precio" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Stock</label>
-                        <input type="number" id="stock" required>
-                    </div>
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Categoría</label>
-                    <select id="categoria" required>
-                        <option value="">Seleccione...</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Imagen</label>
-                    <input type="file" id="imagen" accept="image/*">
+                    <label>Contraseña</label>
+                    <input type="password" id="password" placeholder="Dejar en blanco para no cambiar">
+                    <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">* Requerido solo para nuevos usuarios</p>
                 </div>
 
                 <div class="modal-footer">
@@ -111,6 +93,6 @@
         </div>
     </div>
 
-    <script src="js/productos.js"></script>
+    <script src="js/clientes.js"></script>
 </body>
 </html>

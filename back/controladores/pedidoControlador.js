@@ -127,4 +127,54 @@ const actualizarEstadoPedido = async (req, res) => {
     }
 };
 
-module.exports = { crearPedido, obtenerPedidosAdmin, obtenerMisPedidos, obtenerDetallesPedido, actualizarEstadoPedido };
+const obtenerDetallesAdmin = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [pedido] = await db.query(`
+            SELECT p.*, u.nombre as cliente, u.email, 
+                   d.telefono, d.direccion_calle, d.ciudad, d.estado as estado_dir, d.codigo_postal, d.instrucciones_envio
+            FROM pedidos p
+            JOIN usuarios u ON p.usuario_id = u.id
+            LEFT JOIN clientes_detalles d ON u.id = d.usuario_id
+            WHERE p.id = ?
+        `, [id]);
+
+        if (pedido.length === 0) return res.status(404).send('Pedido no encontrado');
+
+        const [items] = await db.query(`
+            SELECT dp.cantidad, dp.precio_unitario, p.nombre, p.imagen
+            FROM detalles_pedido dp
+            JOIN productos p ON dp.producto_id = p.id
+            WHERE dp.pedido_id = ?
+        `, [id]);
+
+        res.json({ info: pedido[0], items });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener detalles admin');
+    }
+};
+
+const actualizarPedidoAdmin = async (req, res) => {
+    const { id } = req.params;
+    const { estado, comentarios } = req.body;
+
+    try {
+        await db.query('UPDATE pedidos SET estado = ?, comentarios_admin = ? WHERE id = ?', 
+            [estado, comentarios, id]);
+        res.send('Pedido actualizado correctamente');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error actualizando pedido');
+    }
+};
+
+module.exports = { 
+    crearPedido, 
+    obtenerPedidosAdmin, 
+    obtenerMisPedidos, 
+    obtenerDetallesPedido, 
+    actualizarEstadoPedido,
+    obtenerDetallesAdmin,
+    actualizarPedidoAdmin 
+};

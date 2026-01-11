@@ -11,7 +11,6 @@ app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'vivero_secreto_key',
@@ -21,6 +20,16 @@ app.use(session({
         secure: process.env.NODE_ENV === 'production' 
     }
 }));
+
+app.use('/administracion', (req, res, next) => {
+    if (req.session && req.session.usuarioID && req.session.rol === 'admin') {
+        next(); 
+    } else {
+        res.redirect('/clientes/login.html'); 
+    }
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 const rutasAuth = require('./back/rutas/rutasAuth');
 const rutasAdmin = require('./back/rutas/rutasAdmin');

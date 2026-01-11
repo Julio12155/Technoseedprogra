@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controladores/authControlador');
+const authCtrl = require('../controladores/authControlador');
 
-router.post('/registro', authController.registrar);
-router.post('/login', authController.login);
-router.get('/logout', authController.cerrarSesion);
+router.post('/registro', authCtrl.registrar);
+router.post('/login', authCtrl.login);
+router.get('/logout', authCtrl.cerrarSesion);
+router.get('/estado-sesion', authCtrl.verificarEstadoSesion);
 
 module.exports = router;
