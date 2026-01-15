@@ -89,23 +89,27 @@ nav {
 
 .hero {
     height: 60vh;
-    background: linear-gradient(135deg, var(--arena) 0%, var(--beige) 100%);
+    background-image: url('/../imagenes/productos/hover.jpeg');
+    background-size: cover;
+    background-position: center;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    object-fit: contain;
     padding: 2rem;
+
 }
 
 .hero h1 {
     font-size: 3rem;
-    color: var(--texto);
+    color: var(--blanco);
     margin-bottom: 1rem;
 }
 
 .hero p {
     font-size: 1.2rem;
-    color: var(--texto-claro);
+    color: var(--blanco);
     max-width: 600px;
     margin: 0 auto 2rem;
 }
