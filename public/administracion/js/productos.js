@@ -101,7 +101,7 @@ form.addEventListener('submit', async (e) => {
     
     const fileInput = document.getElementById('imagen');
     if (fileInput.files[0]) {
-        formData.append('foto', fileInput.files[0]);
+        formData.append('imagen', fileInput.files[0]);
     }
 
     const url = id ? `/api/admin/productos/${id}` : '/api/admin/productos';

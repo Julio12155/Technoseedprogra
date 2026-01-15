@@ -5,6 +5,8 @@ const pedidoCtrl = require('../controladores/pedidoControlador');
 const adminUserCtrl = require('../controladores/adminUsuariosControlador');
 const { verificarSesionAdmin } = require('../middleware/verificarSesion');
 
+const subir = require('../middleware/gestorImagenes'); 
+
 router.use(verificarSesionAdmin);
 
 router.get('/dashboard-datos', async (req, res) => {
@@ -27,8 +29,9 @@ router.get('/dashboard-datos', async (req, res) => {
 });
 
 router.get('/productos', productoCtrl.obtenerTodas);
-router.post('/productos', productoCtrl.crearProducto);
-router.put('/productos/:id', productoCtrl.editarProducto);
+router.post('/productos', subir.single('imagen'), productoCtrl.crearProducto);
+router.put('/productos/:id', subir.single('imagen'), productoCtrl.editarProducto);
+
 router.delete('/productos/:id', productoCtrl.eliminarProducto);
 router.put('/productos/reabastecer/:id', productoCtrl.reabastecerStock);
 router.get('/categorias', productoCtrl.obtenerCategorias);
