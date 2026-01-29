@@ -89,7 +89,7 @@ nav {
 
 .hero {
     height: 60vh;
-    background-image: url('/../imagenes/productos/hover.jpeg');
+    background-image: url('/../imagenes/productos/hover.jpg');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -98,6 +98,7 @@ nav {
     text-align: center;
     object-fit: contain;
     padding: 2rem;
+    color:#333333;
 
 }
 
