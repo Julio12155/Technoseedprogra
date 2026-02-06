@@ -173,19 +173,31 @@ const consultarDireccionAPI = async (req, res) => {
     try {
         const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
         
+        console.log(`[Mapa] Consultando: ${lat}, ${lon}`);
+
         const respuesta = await fetch(url, {
             headers: {
-                'User-Agent': 'ViveroSolisApp/1.0 (viverosolis@example.com)' 
+                'User-Agent': 'ViveroSolisWeb/1.0 (contacto@technoseed.voltronhost.com)',
+                'Accept-Language': 'es'
             }
         });
 
-        if (!respuesta.ok) throw new Error('Error en API externa');
+        if (!respuesta.ok) {
+            console.error(`[Mapa] Error HTTP: ${respuesta.status} ${respuesta.statusText}`);
+            const errorBody = await respuesta.text();
+            console.error(`[Mapa] Respuesta API: ${errorBody}`);
+            
+            throw new Error(`Nominatim bloqueó la petición: ${respuesta.status}`);
+        }
         
         const data = await respuesta.json();
         res.json(data);
     } catch (error) {
-        console.error('Error Proxy Mapa:', error);
-        res.status(500).json({ error: 'No se pudo obtener la dirección' });
+        console.error('[Mapa] Fallo crítico:', error.message);
+        res.status(500).json({ 
+            error: 'No se pudo obtener la dirección', 
+            detalle: error.message 
+        });
     }
 };
 

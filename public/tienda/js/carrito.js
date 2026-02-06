@@ -61,10 +61,10 @@ function renderizarCarrito() {
     let total = 0;
     carrito.forEach(p => {
         total += p.precio * p.cantidad;
-        const img = p.imagen ? `/imagenes/productos/${p.imagen}` : 'https://via.placeholder.com/50';
+        const img = p.imagen ? `/imagenes/productos/${p.imagen}` : 'https://placehold.co/50';
         contenedor.innerHTML += `
             <div class="item-carrito">
-                <img src="${img}" alt="${p.nombre}">
+                <img src="${img}" alt="${p.nombre}" onerror="this.src='https://placehold.co/50'">
                 <div class="item-info">
                     <h4>${p.nombre}</h4>
                     <p>$${p.precio}</p>
@@ -83,7 +83,6 @@ function renderizarCarrito() {
     if(elTotal) elTotal.innerText = `$${total.toFixed(2)}`;
     if(elSub) elSub.innerText = `$${total.toFixed(2)}`;
 }
-
 
 async function abrirModalSeleccion() {
     const carrito = obtenerCarrito();

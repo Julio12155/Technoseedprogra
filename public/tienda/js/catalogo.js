@@ -1,69 +1,59 @@
-document.addEventListener('DOMContentLoaded', async () => {
-    const contenedor = document.getElementById('contenedor-productos');
-    try {
-        const res = await fetch('/api/public/productos'); 
-        const productos = await res.json();
-        
-        contenedor.innerHTML = '';
-        
-        if (productos.length === 0) {
-            contenedor.innerHTML = '<p>No hay productos disponibles.</p>';
-            return;
-        }
+document.addEventListener('DOMContentLoaded', () => {
+    cargarProductos();
+    cargarCategorias();
+});
 
-        productos.forEach(p => renderizarProducto(p, contenedor));
+async function cargarProductos() {
+    try {
+        const res = await fetch('/api/public/productos');
+        const productos = await res.json();
+        renderizarProductos(productos);
     } catch (error) {
         console.error(error);
     }
-});
-
-function renderizarProducto(producto, contenedor) {
-    const hayStock = producto.stock > 0;
-    const stockClass = hayStock ? 'stock-info' : 'stock-info stock-agotado';
-    const textoStock = hayStock ? `Disponibles: ${producto.stock}` : 'Agotado';
-    const textoBoton = hayStock ? 'Agregar' : 'Sin Stock';
-    const claseBoton = hayStock ? 'btn-comprar' : 'btn-comprar sin-stock';
-    const imgUrl = producto.imagen ? `/imagenes/productos/${producto.imagen}` : 'https://via.placeholder.com/300x250?text=Sin+Imagen';
-
-    const card = document.createElement('div');
-    card.className = 'producto-card';
-    card.innerHTML = `
-        <img src="${imgUrl}" class="producto-img" alt="${producto.nombre}" onerror="this.src='https://via.placeholder.com/300x250?text=Error+Imagen'">
-        <div class="producto-info">
-            <h3>${producto.nombre}</h3>
-            <p style="font-size: 0.8rem; color: #888;">${producto.nombre_categoria || 'General'}</p>
-            <p class="${stockClass}">${textoStock}</p>
-            <p>${producto.descripcion || ''}</p>
-            <p class="producto-precio">$${producto.precio}</p>
-            
-            <div class="controls-compra">
-                <input type="number" id="cant-${producto.id}" class="input-cantidad" value="1" min="1" max="${producto.stock}" ${!hayStock ? 'disabled hidden' : ''}>
-                <button class="${claseBoton}" onclick="clickComprar(${producto.id}, '${producto.nombre}', ${producto.precio}, '${producto.imagen}', ${producto.stock})" ${!hayStock ? 'disabled' : ''}>
-                    ${textoBoton}
-                </button>
-            </div>
-        </div>
-    `;
-    contenedor.appendChild(card);
 }
 
-function clickComprar(id, nombre, precio, imagen, stock) {
-    const input = document.getElementById(`cant-${id}`);
-    const cantidad = parseInt(input.value);
+async function cargarCategorias() {
+    try {
+        const res = await fetch('/api/public/categorias');
+        const categorias = await res.json();
+        const nav = document.getElementById('categorias-nav');
+        nav.innerHTML = '<button class="cat-btn active" onclick="filtrarCategoria(\'todas\')">Todas</button>';
+        
+        categorias.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'cat-btn';
+            btn.textContent = cat.nombre;
+            btn.onclick = () => filtrarCategoria(cat.id);
+            nav.appendChild(btn);
+        });
+    } catch (error) { console.error(error); }
+}
 
-    if (cantidad < 1) {
-        alert("La cantidad debe ser al menos 1");
-        return;
-    }
+function renderizarProductos(lista) {
+    const contenedor = document.getElementById('lista-productos');
+    contenedor.innerHTML = '';
     
-    if (cantidad > stock) {
-        alert(`No puedes agregar más de ${stock} unidades.`);
-        return;
-    }
-
-    agregarAlCarrito(id, nombre, precio, imagen, stock, cantidad);
+    lista.forEach(p => {
+        const img = p.imagen ? `/imagenes/productos/${p.imagen}` : 'https://placehold.co/300';
+        
+        const card = document.createElement('div');
+        card.className = 'producto-card';
+        card.innerHTML = `
+            <img src="${img}" alt="${p.nombre}" onerror="this.src='https://placehold.co/300'">
+            <div class="producto-info">
+                <h3>${p.nombre}</h3>
+                <p class="precio">$${p.precio}</p>
+                <button class="btn-agregar" onclick="agregarAlCarrito(${p.id}, '${p.nombre}', ${p.precio}, '${p.imagen}', ${p.stock}, 1)">
+                    Añadir al Carrito
+                </button>
+                <a href="detalle.html?id=${p.id}" style="display:block; text-align:center; margin-top:0.5rem; color:var(--verde-oscuro)">Ver Detalle</a>
+            </div>
+        `;
+        contenedor.appendChild(card);
+    });
 }
 
-function filtrar(tipo) {
-    alert('Funcionalidad de filtro en construcción. Mostrando todos.');
+function filtrarCategoria(catId) {
+    alert('Filtro en construcción'); 
 }
