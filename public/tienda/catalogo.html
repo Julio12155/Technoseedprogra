@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Completo - Vivero Solís</title>
     <link rel="stylesheet" href="css/estilos.css">
+    <style>
+        .categorias-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .cat-btn {
+            background: white;
+            border: 1px solid var(--verde-acento);
+            color: var(--verde-acento);
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .cat-btn:hover, .cat-btn.active {
+            background: var(--verde-acento);
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
@@ -20,15 +42,18 @@
         </nav>
     </header>
 
-    <section class="hero" style="height: 60vh;">
+    <section class="hero" style="height: 40vh;">
         <div>
             <h1>Nuestro Catálogo</h1>
             <p>Explora nuestra variedad completa de plantas y accesorios</p>
         </div>
     </section>
 
+    <div id="categorias-nav" class="categorias-container">
+        </div>
+
     <section class="catalogo-section">
-        <div id="contenedor-productos" class="catalogo-grid">
+        <div id="lista-productos" class="catalogo-grid">
             <p style="text-align: center; width: 100%;">Cargando todo el catálogo...</p>
         </div>
     </section>
