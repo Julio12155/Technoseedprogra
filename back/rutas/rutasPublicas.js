@@ -20,6 +20,8 @@ router.post('/direcciones', soloUsuarios, clienteCtrl.agregarDireccion);
 router.delete('/direcciones/:id', soloUsuarios, clienteCtrl.eliminarDireccion);
 router.put('/direcciones/:id/predeterminada', soloUsuarios, clienteCtrl.establecerPredeterminada);
 
+router.get('/geocodificacion', soloUsuarios, clienteCtrl.consultarDireccionAPI);
+
 router.get('/mis-pedidos', soloUsuarios, pedidoCtrl.obtenerMisPedidos);
 router.get('/mis-pedidos/:id', soloUsuarios, pedidoCtrl.obtenerDetallesPedido);
 

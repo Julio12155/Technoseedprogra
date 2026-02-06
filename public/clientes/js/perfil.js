@@ -32,7 +32,7 @@ async function cargarPerfil() {
 
         const avatarContainer = document.getElementById('avatar-container');
         if (data.avatar && data.avatar !== 'default.png') {
-            avatarContainer.innerHTML = `<img src="/imagenes/productos/${data.avatar}" class="avatar-img" alt="Avatar">`;
+            avatarContainer.innerHTML = `<img src="/imagenes/productos/${data.avatar}" class="avatar-img" onerror="this.src='https://placehold.co/100x100?text=U'">`;
         } else {
             avatarContainer.innerHTML = `<div class="avatar" id="avatar-letra">${data.nombre.charAt(0).toUpperCase()}</div>`;
         }
@@ -41,17 +41,18 @@ async function cargarPerfil() {
         document.getElementById('edit-email').value = data.email;
         document.getElementById('edit-telefono').value = data.telefono || '';
         
+        const previewImg = document.getElementById('preview-avatar');
         if (data.avatar && data.avatar !== 'default.png') {
-            document.getElementById('preview-avatar').src = `/imagenes/productos/${data.avatar}`;
+            previewImg.src = `/imagenes/productos/${data.avatar}`;
+            previewImg.onerror = () => { previewImg.src = 'https://placehold.co/100x100?text=Foto'; };
         } else {
-            document.getElementById('preview-avatar').src = 'https://via.placeholder.com/100?text=' + data.nombre.charAt(0).toUpperCase();
+            previewImg.src = 'https://placehold.co/100x100?text=' + data.nombre.charAt(0).toUpperCase();
         }
 
     } catch (error) { 
         console.error(error); 
     }
 }
-
 
 function mostrarPrevisualizacion(event) {
     const file = event.target.files[0];
@@ -160,7 +161,6 @@ async function hacerPrincipal(id) {
     } catch(e) { console.error(e); }
 }
 
-
 function abrirModalDireccion() {
     document.getElementById('modalDireccion').style.display = 'block';
     
@@ -182,7 +182,7 @@ function abrirModalDireccion() {
             document.getElementById('calle').value = 'Buscando dirección...';
             
             try {
-                const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+                const url = `/api/public/geocodificacion?lat=${lat}&lon=${lng}`;
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -243,7 +243,6 @@ document.getElementById('form-nueva-direccion').addEventListener('submit', async
     } catch (e) { alert('Error de conexión'); }
 });
 
-
 async function cargarPedidos() {
     try {
         const res = await fetch('/api/public/mis-pedidos');
@@ -289,7 +288,7 @@ async function verDetallesPedido(id) {
         let htmlItems = '';
         items.forEach(item => {
             const subtotal = item.cantidad * item.precio_unitario;
-            const imagen = item.imagen ? `/imagenes/productos/${item.imagen}` : 'https://via.placeholder.com/50';
+            const imagen = item.imagen ? `/imagenes/productos/${item.imagen}` : 'https://placehold.co/50';
             
             htmlItems += `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">
