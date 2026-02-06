@@ -165,6 +165,30 @@ const actualizarDatosPersonales = async (req, res) => {
     }
 };
 
+const consultarDireccionAPI = async (req, res) => {
+    const { lat, lon } = req.query;
+
+    if (!lat || !lon) return res.status(400).json({ error: 'Coordenadas requeridas' });
+
+    try {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+        
+        const respuesta = await fetch(url, {
+            headers: {
+                'User-Agent': 'ViveroSolisApp/1.0 (viverosolis@example.com)' 
+            }
+        });
+
+        if (!respuesta.ok) throw new Error('Error en API externa');
+        
+        const data = await respuesta.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error Proxy Mapa:', error);
+        res.status(500).json({ error: 'No se pudo obtener la dirección' });
+    }
+};
+
 module.exports = { 
     obtenerPerfil, 
     guardarTelefono, 
@@ -172,5 +196,6 @@ module.exports = {
     agregarDireccion, 
     eliminarDireccion, 
     establecerPredeterminada,
-    actualizarDatosPersonales
+    actualizarDatosPersonales,
+    consultarDireccionAPI
 };
