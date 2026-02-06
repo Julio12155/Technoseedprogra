@@ -2,17 +2,20 @@ const db = require('../configuracion/BaseDatos');
 
 const crearPedido = async (req, res) => {
     const id_usuario = req.session.usuarioID; 
-    const { productos } = req.body; 
+    const { productos, direccion_id } = req.body; 
 
     try {
-        const [detalles] = await db.query('SELECT id FROM clientes_detalles WHERE usuario_id = ?', [id_usuario]);
+        const [dirRows] = await db.query('SELECT * FROM direcciones WHERE id = ? AND usuario_id = ?', [direccion_id, id_usuario]);
         
-        if (detalles.length === 0) {
+        if (dirRows.length === 0) {
             return res.status(400).json({ 
                 error: 'Falta direccion', 
-                mensaje: 'Debes registrar tu dirección de envío en tu perfil antes de comprar.' 
+                mensaje: 'Debes seleccionar una dirección de envío válida.' 
             });
         }
+
+        const direccionSnapshot = `${dirRows[0].calle}, ${dirRows[0].ciudad}, ${dirRows[0].estado}, CP: ${dirRows[0].codigo_postal}`;
+        const instruccionesSnapshot = dirRows[0].instrucciones || '';
 
         let total = 0;
         
@@ -26,8 +29,11 @@ const crearPedido = async (req, res) => {
             total += prod[0].precio * item.cantidad;
         }
 
-        const [resPedido] = await db.query('INSERT INTO pedidos (usuario_id, total, estado) VALUES (?, ?, "pendiente")', 
-            [id_usuario, total]);
+        const [resPedido] = await db.query(
+            `INSERT INTO pedidos (usuario_id, total, estado, direccion_entrega, instrucciones_entrega) 
+             VALUES (?, ?, "pendiente", ?, ?)`, 
+            [id_usuario, total, direccionSnapshot, instruccionesSnapshot]
+        );
         
         const idPedido = resPedido.insertId;
 
@@ -53,10 +59,9 @@ const obtenerPedidosAdmin = async (req, res) => {
     try {
         const sql = `
             SELECT p.id, p.total, p.estado, p.fecha, u.nombre as cliente, 
-                   d.direccion_calle, d.ciudad 
+                   p.direccion_entrega as direccion_completa
             FROM pedidos p
             JOIN usuarios u ON p.usuario_id = u.id
-            LEFT JOIN clientes_detalles d ON u.id = d.usuario_id
             ORDER BY p.fecha DESC
         `;
         const [pedidos] = await db.query(sql);
@@ -132,7 +137,7 @@ const obtenerDetallesAdmin = async (req, res) => {
     try {
         const [pedido] = await db.query(`
             SELECT p.*, u.nombre as cliente, u.email, 
-                   d.telefono, d.direccion_calle, d.ciudad, d.estado as estado_dir, d.codigo_postal, d.instrucciones_envio
+                   d.telefono
             FROM pedidos p
             JOIN usuarios u ON p.usuario_id = u.id
             LEFT JOIN clientes_detalles d ON u.id = d.usuario_id

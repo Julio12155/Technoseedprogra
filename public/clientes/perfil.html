@@ -5,13 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Perfil - Vivero Solís</title>
     <link rel="stylesheet" href="css/estilos.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
     <style>
+        #mapa { height: 300px; width: 100%; border-radius: 8px; margin-bottom: 1rem; z-index: 1; }
+        .address-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .address-card { border: 1px solid var(--borde); border-radius: 10px; padding: 1.5rem; position: relative; transition: all 0.3s; background: white; }
+        .address-card.principal { border: 2px solid var(--verde-acento); background-color: rgba(95, 141, 78, 0.05); }
+        .badge-principal { position: absolute; top: 10px; right: 10px; background: var(--verde-acento); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
+        .card-actions { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--borde); display: flex; gap: 0.5rem; justify-content: flex-end; }
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto; }
-        .modal-content { background-color: var(--blanco); margin: 5% auto; padding: 2rem; border-radius: 15px; width: 90%; max-width: 700px; box-shadow: 0 5px 30px rgba(0,0,0,0.2); animation: fadeIn 0.3s; position: relative; }
-        .close { position: absolute; top: 1rem; right: 1.5rem; font-size: 1.5rem; font-weight: bold; color: var(--texto-claro); cursor: pointer; }
-        .detalle-row { display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid var(--borde); }
-        .detalle-header { font-weight: bold; background-color: var(--gris-claro); padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; }
-        .detalle-total { font-size: 1.2rem; font-weight: bold; color: var(--verde-acento); text-align: right; margin-top: 1.5rem; }
+        .modal-content { background-color: var(--blanco); margin: 2% auto; padding: 2rem; border-radius: 15px; width: 95%; max-width: 700px; position: relative; }
+        .close { position: absolute; top: 1rem; right: 1.5rem; font-size: 1.5rem; cursor: pointer; }
+        
+        .avatar-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--verde-acento); display: block; margin: 0 auto 1rem; }
+        .user-header .avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -28,48 +36,30 @@
     <div class="container">
         <aside class="sidebar-perfil">
             <div class="user-header">
-                <div class="avatar" id="avatar-letra">U</div>
+                <div id="avatar-container">
+                    <div class="avatar" id="avatar-letra">U</div>
+                </div>
                 <h3 id="nombre-usuario">Cargando...</h3>
                 <p id="email-usuario" style="font-size: 0.9rem; color: var(--texto-claro);">...</p>
             </div>
             <div class="menu-opciones">
-                <button onclick="cambiarTab('direccion')" class="active" id="btn-direccion">📍 Dirección de Envío</button>
+                <button onclick="cambiarTab('direccion')" class="active" id="btn-direccion">📍 Mis Direcciones</button>
                 <button onclick="cambiarTab('pedidos')" id="btn-pedidos">📦 Mis Pedidos</button>
+                <button onclick="cambiarTab('datos')" id="btn-datos">👤 Mis Datos</button>
             </div>
         </aside>
 
         <main class="content-area">
+            
             <div id="direccion" class="seccion active">
-                <h2 class="section-title">Dirección de Envío</h2>
-                <form id="form-direccion">
-                    <div class="form-group">
-                        <label>Teléfono de contacto</label>
-                        <input type="tel" id="tel" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Calle y Número</label>
-                        <input type="text" id="calle" required>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="form-group">
-                            <label>Ciudad</label>
-                            <input type="text" id="ciudad" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Estado</label>
-                            <input type="text" id="estado" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Código Postal</label>
-                        <input type="text" id="cp" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Instrucciones de entrega (Opcional)</label>
-                        <textarea id="instrucc" rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn-guardar">Guardar Dirección</button>
-                </form>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="section-title" style="margin: 0; border: none;">Mis Direcciones</h2>
+                    <button id="btn-nueva-dir" class="btn-guardar" style="width: auto; padding: 0.5rem 1rem; margin: 0;" onclick="abrirModalDireccion()">+ Nueva Dirección</button>
+                </div>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">Máximo 3 direcciones. Selecciona una como predeterminada.</p>
+                <div id="lista-direcciones" class="address-grid">
+                    <p>Cargando direcciones...</p>
+                </div>
             </div>
 
             <div id="pedidos" class="seccion">
@@ -78,37 +68,98 @@
                     <p>Cargando historial...</p>
                 </div>
             </div>
+
+            <div id="datos" class="seccion">
+                <h2 class="section-title">Editar Mis Datos</h2>
+                <div class="address-card" style="max-width: 500px; margin: 0 auto;">
+                    <form id="form-datos">
+                        <div style="text-align: center;">
+                            <img id="preview-avatar" src="https://via.placeholder.com/100" class="avatar-preview">
+                            <label for="input-avatar" class="action-btn" style="cursor: pointer;">Cambiar Foto</label>
+                            <input type="file" id="input-avatar" accept="image/*" style="display: none;" onchange="mostrarPrevisualizacion(event)">
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label>Nombre Completo</label>
+                            <input type="text" id="edit-nombre" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="edit-telefono" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo (No editable)</label>
+                            <input type="email" id="edit-email" disabled style="background-color: #f0f0f0; color: #888;">
+                        </div>
+
+                        <button type="submit" class="btn-guardar">Actualizar Información</button>
+                    </form>
+                </div>
+            </div>
+
         </main>
+    </div>
+
+    <div id="modalDireccion" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModalDireccion()">&times;</span>
+            <h2 style="color: var(--verde-acento); margin-bottom: 1rem;">Agregar Nueva Dirección</h2>
+            
+            <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">1. Haz clic en el mapa para ubicar tu domicilio:</p>
+            <div id="mapa"></div>
+
+            <form id="form-nueva-direccion">
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Alias (Ej: Casa, Oficina)</label>
+                        <input type="text" id="alias" required placeholder="Mi Casa">
+                    </div>
+                    <div class="form-group">
+                        <label>Código Postal</label>
+                        <input type="text" id="cp" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Calle y Número (Se llena con el mapa)</label>
+                    <input type="text" id="calle" required readonly style="background-color: #f9f9f9;">
+                </div>
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Ciudad</label>
+                        <input type="text" id="ciudad" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" id="estado" required>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="lat">
+                <input type="hidden" id="lng">
+
+                <div class="form-group">
+                    <label>Instrucciones de Entrega / Fachada / Color</label>
+                    <textarea id="instrucc" rows="2" placeholder="Ej: Portón negro, dejar con el vigilante..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-guardar">Guardar Dirección</button>
+            </form>
+        </div>
     </div>
 
     <div id="modalDetalle" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="cerrarModal()">&times;</span>
-            <h2 style="margin-bottom: 1.5rem; color: var(--verde-acento);">Detalles del Pedido #<span id="detalle-id"></span></h2>
-            
-            <div style="margin-bottom: 1.5rem;">
-                <p><strong>Fecha:</strong> <span id="detalle-fecha"></span></p>
-                <p><strong>Estado:</strong> <span id="detalle-estado"></span></p>
-            </div>
-
-            <div class="detalle-header" style="display: flex; justify-content: space-between;">
-                <span>Producto</span>
-                <span>Subtotal</span>
-            </div>
-            
-            <div id="detalle-items"></div>
-
-            <div class="detalle-row">
-                <span>Envío</span>
-                <span>Gratis</span>
-            </div>
-
-            <div class="detalle-total">
-                Total: $<span id="detalle-total"></span>
-            </div>
+            <span class="close" onclick="document.getElementById('modalDetalle').style.display='none'">&times;</span>
+            <h2 style="margin-bottom: 1rem;">Detalles del Pedido</h2>
+            <div id="detalle-contenido"></div>
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="js/perfil.js"></script>
 </body>
 </html>

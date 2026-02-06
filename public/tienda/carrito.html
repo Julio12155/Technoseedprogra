@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Carrito - Vivero Solís</title>
     <link rel="stylesheet" href="css/estilos.css">
+    <style>
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: white; margin: 10% auto; padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; }
+        .opcion-direccion { border: 1px solid #ddd; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .opcion-direccion:hover { background-color: #f9f9f9; border-color: var(--verde-acento); }
+        .opcion-direccion.seleccionada { border: 2px solid var(--verde-acento); background-color: rgba(95, 141, 78, 0.1); }
+    </style>
 </head>
 <body>
 
@@ -35,28 +43,32 @@
 
             <div class="carrito-resumen">
                 <h3>Resumen del Pedido</h3>
-                <div class="resumen-row">
-                    <span>Subtotal</span>
-                    <span id="subtotal">$0.00</span>
-                </div>
-                <div class="resumen-row">
-                    <span>Envío</span>
-                    <span>Gratis</span>
-                </div>
-                <div class="resumen-total">
-                    <span>Total</span>
-                    <span id="total-final">$0.00</span>
-                </div>
-                <button class="btn-checkout" onclick="procesarCompra()">Proceder al Pago</button>
+                <div class="resumen-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+                <div class="resumen-row"><span>Envío</span><span>Gratis</span></div>
+                <div class="resumen-total"><span>Total</span><span id="total-final">$0.00</span></div>
+                
+                <button class="btn-checkout" onclick="abrirModalSeleccion()">Proceder al Pago</button>
+                
                 <a href="catalogo.html" style="display: block; text-align: center; margin-top: 1rem; color: var(--texto-claro); text-decoration: none;">Seguir comprando</a>
             </div>
         </div>
     </section>
 
-    <footer>
-        <p>Vivero Solís &copy; 2025</p>
-    </footer>
+    <div id="modalSeleccion" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--verde-acento); margin-bottom: 1rem;">Selecciona Dirección de Envío</h2>
+            <div id="lista-direcciones-modal">
+                <p>Cargando direcciones...</p>
+            </div>
+            
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="action-btn" onclick="document.getElementById('modalSeleccion').style.display='none'">Cancelar</button>
+                <button class="btn-checkout" style="width: auto; padding: 0.8rem 2rem;" onclick="confirmarCompra()">Confirmar Compra</button>
+            </div>
+        </div>
+    </div>
 
+    <footer><p>Vivero Solís &copy; 2025</p></footer>
     <script src="js/carrito.js"></script>
 </body>
 </html>
