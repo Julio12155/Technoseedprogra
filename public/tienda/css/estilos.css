@@ -131,6 +131,22 @@ nav {
     transform: translateY(-3px);
 }
 
+.btn-agregar {
+    background-color: var(--verde-acento);
+    color: var(--blanco);
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s;
+    display: inline-block;
+}
+
+.btn-agregar:hover {
+    background-color: var(--verde-suave);
+    transform: translateY(-3px);
+}
+
 .historia {
     max-width: 1000px;
     margin: 5rem auto;
